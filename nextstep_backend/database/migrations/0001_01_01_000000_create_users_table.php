@@ -30,11 +30,15 @@ return new class extends Migration
             
             // Status and timestamps
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
+            $table->enum('login_status', ['online', 'offline'])->default('offline'); // NEW FIELD
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('last_login_at')->nullable();
+            $table->timestamp('last_logout_at')->nullable();
+            $table->timestamp('deactivated_at')->nullable();
+            $table->timestamp('banned_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
-	    $table->softDeletes(); // Add to users, institutions, posts, etc.
+	        $table->softDeletes(); // Add to users, institutions, posts, etc.
         });
     }
 

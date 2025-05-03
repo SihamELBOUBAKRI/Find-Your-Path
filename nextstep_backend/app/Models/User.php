@@ -3,15 +3,19 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-
+    use HasApiTokens;
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
     /**
      * The attributes that are mass assignable.
      *
@@ -21,6 +25,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'avatar',
+        'bio',
+        'linkedin_url',
+        'phone',
+        'personality_type',
+        'recommended_major',
+        'status','login_status','last_login_at','last_logout_at','deactivated_at', 'deleted_at','ban_date'
     ];
 
     /**
@@ -115,5 +127,20 @@ public function receivedMessages()
 public function reviews()
 {
     return $this->hasMany(Review::class);
+}
+
+protected static function boot()
+{
+    parent::boot();
+
+    static::saving(function ($user) {
+        // Automatically ban inactive accounts after 30 days
+        if ($user->status === 'inactive' && $user->deactivated_at && $user->deactivated_at->diffInDays() >= 30) {
+            $user->status = 'banned';
+            $user->banned_at = now();
+            $user->deleted_at = now();
+            
+        }
+    });
 }
 }

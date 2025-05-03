@@ -4,9 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SavedItem extends Model
+class UserSavedItem extends Model
 {
-    // app/Models/UserSavedItem.php
+    protected $table = 'user_saved_items';
+
+    protected $fillable = [
+        'user_id',
+        'institution_id',
+        'event_id',
+        'type'
+    ];
 
 public function user()
 {

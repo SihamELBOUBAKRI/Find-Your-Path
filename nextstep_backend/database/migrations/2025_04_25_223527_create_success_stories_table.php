@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('major'); // E.g., "Computer Science"
             $table->string('institution'); // E.g., "EMI"
             $table->string('photo_url')->nullable(); // Optional profile image
-            $table->string('slug')->unique()->after('name');
+            $table->string('slug')->unique();
             $table->timestamps();
         });
     }
