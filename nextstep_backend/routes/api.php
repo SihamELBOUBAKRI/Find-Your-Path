@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\MajorController;
 use App\Http\Controllers\InstitutionController;
 
 // Public routes (no authentication required)
@@ -10,6 +12,9 @@ Route::post('/users', [UserController::class, 'store']); //DONE
 Route::post('/register', [AuthController::class, 'register']);//DONE
 Route::post('/login', [AuthController::class, 'login']);//DONE
 Route::post('/restore-account', [AuthController::class, 'reactivateAccount']);
+
+
+   
 // Authenticated routes (Sanctum protected)
 Route::middleware(['auth:sanctum'])->group(function () {
     //Auth routes
@@ -31,4 +36,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('institutions', InstitutionController::class);//DONE
     Route::get('/institutions/{institution}/majors', [InstitutionController::class, 'majors']);//DONE
     Route::get('/institutions/{institution}/events', [InstitutionController::class, 'events']);//DONE
+    
+    // major routes
+    Route::apiResource('majors', MajorController::class);
+    Route::get('majors/{major}/institutions', [MajorController::class, 'institutions']);
+
+    // events routes
+    Route::apiResource('events', EventController::class);//DONE
+    Route::post('events/{event}/register', [EventController::class, 'registerUser']);//DONE
+    Route::get('events/{event}/users', [EventController::class, 'getRegisteredUsers']);//DONE
+    
 });
