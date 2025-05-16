@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\CheckPostOwner;
 use Illuminate\Support\ServiceProvider;
+use App\Http\Middleware\CheckCommentOwner;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,8 +20,19 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
-    {
-        //
+    public function boot()
+{
+        // Register middleware alias
+        $router = $this->app['router'];
+        $router->aliasMiddleware('role', CheckRole::class);
+        $router->aliasMiddleware('post.owner', CheckPostOwner::class);
+        $router->aliasMiddleware('comment.owner',CheckCommentOwner::class);
+
+        // If you need to configure routes, do it like this:
+        $this->app->booted(function () {
+            $this->app['router']->get('/test', function () {
+                return 'Test route';
+            });
+        });
     }
 }

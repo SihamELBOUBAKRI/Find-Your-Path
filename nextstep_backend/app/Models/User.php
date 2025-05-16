@@ -128,6 +128,11 @@ public function reviews()
 {
     return $this->hasMany(Review::class);
 }
+public function likedPosts(): BelongsToMany
+{
+    return $this->belongsToMany(Post::class, 'post_user_likes')
+        ->withTimestamps();
+}
 
 protected static function boot()
 {

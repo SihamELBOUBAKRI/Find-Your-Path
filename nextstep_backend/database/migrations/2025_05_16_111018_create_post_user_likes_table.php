@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quotes', function (Blueprint $table) {
+       Schema::create('post_user_likes', function (Blueprint $table) {
             $table->id();
-            $table->string('quote'); // E.g., "Education is the passport to the future."
-            $table->string('author'); // E.g., "Malcolm X"
+            $table->foreignId('post_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
+            
+            $table->unique(['post_id', 'user_id']); // Prevent duplicate likes
         });
     }
 
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('quotes');
+        Schema::dropIfExists('post_user_likes');
     }
 };
