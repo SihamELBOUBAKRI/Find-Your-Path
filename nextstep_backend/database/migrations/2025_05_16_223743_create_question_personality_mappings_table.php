@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quiz_answers', function (Blueprint $table) {
+        Schema::create('question_personality_mappings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
             $table->foreignId('question_id')->constrained('quiz_questions');
-            $table->integer('weight');
+            $table->foreignId('personality_type_id')->constrained('personality_types');
+            $table->integer('weight_multiplier')->default(1); // How much this question contributes
+            $table->integer('direction'); // 1 = positive weight increases this type, -1 = negative
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('quiz_answers');
+        Schema::dropIfExists('question_personality_mappings');
     }
 };

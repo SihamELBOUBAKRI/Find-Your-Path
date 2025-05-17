@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('phone', 20)->nullable();
             
             // Career guidance fields
-            $table->string('personality_type', 10)->nullable(); // e.g., "INTJ"
+            $table->foreignId('personality_type_id')->nullable()->constrained('personality_types');
             $table->string('recommended_major', 100)->nullable();
             
             // Status and timestamps

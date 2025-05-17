@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('question');
             $table->enum('category', ['personality', 'interests', 'skills']);
-            $table->integer('weight')->default(1);
+            $table->integer('weight')->default(0);
             $table->timestamps();
         });
     }

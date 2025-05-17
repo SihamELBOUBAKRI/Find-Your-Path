@@ -30,7 +30,7 @@ class User extends Authenticatable
         'bio',
         'linkedin_url',
         'phone',
-        'personality_type',
+        'personality_type_id',
         'recommended_major',
         'status','login_status','last_login_at','last_logout_at','deactivated_at', 'deleted_at','ban_date'
     ];
@@ -132,6 +132,10 @@ public function likedPosts(): BelongsToMany
 {
     return $this->belongsToMany(Post::class, 'post_user_likes')
         ->withTimestamps();
+}
+public function personalityType()
+{
+    return $this->belongsTo(PersonalityType::class);
 }
 
 protected static function boot()

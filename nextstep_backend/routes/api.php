@@ -11,8 +11,11 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\SavedItemController;
 use App\Http\Controllers\UserEventController;
+use App\Http\Controllers\QuizAnswerController;
 use App\Http\Controllers\InstitutionController;
+use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\SuccessStoryController;
+use App\Http\Controllers\PersonalityTypeController;
 use App\Http\Controllers\InstitutionMajorController;
 
 // Public routes (no authentication required)
@@ -40,6 +43,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/profile', [UserController::class, 'updateProfile']);//DONE
     Route::get('/users/{user}/saved-items', [UserController::class, 'savedItems']);//DONE
     Route::get('/users/{user}/posts', [UserController::class, 'posts']);//DONE
+    Route::get('users/by-personality/{type}', [UserController::class, 'getByPersonality']);
+    Route::patch('users/{user}/personality', [UserController::class, 'updatePersonality'])
+    ->middleware(['role:admin']);
 
     // Institution routes
     Route::apiResource('institutions', InstitutionController::class);//DONE
@@ -111,4 +117,29 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/saved-items/institutions', [SavedItemController::class, 'savedInstitutions']);//DONE
     Route::get('/saved-items/events', [SavedItemController::class, 'savedEvents']);//DONE
     
+
+    // Quiz Questions
+    Route::apiResource('questions', QuizQuestionController::class)->except(['update']);//DONE
+    Route::patch('questions/{question}', [QuizQuestionController::class, 'update']);//DONE
+    Route::post('questions/{question}/mappings', [QuizQuestionController::class, 'addPersonalityMapping'])
+    ->middleware(['role:admin']);//DONE
+    Route::get('/questions/{question}/mappings', [QuizQuestionController::class, 'getPersonalityMappings'])
+    ->middleware(['role:admin']);//DONE
+   
+
+    // Quiz Answers
+    Route::post('/quiz/answers', [QuizAnswerController::class, 'store']);//DONE
+    Route::get('quiz/personality-analysis', [QuizAnswerController::class, 'personalityAnalysis']);//DONE
+    
+    // Admin-only endpoints
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/quiz/answers', [QuizAnswerController::class, 'index']);//DONE
+        Route::get('/quiz/answers/{answer}', [QuizAnswerController::class, 'show']);//DONE
+        Route::put('/quiz/answers/{answer}', [QuizAnswerController::class, 'update']);//DONE
+        Route::delete('/quiz/answers/{answer}', [QuizAnswerController::class, 'destroy']);//DONE
+        Route::get('/quiz/answers/user/{userId}', [QuizAnswerController::class, 'getUserAnswers']);//DONE
+
+    });
+    // Personality Types routes
+    Route::apiResource('personality-types', PersonalityTypeController::class);//DONE
 });

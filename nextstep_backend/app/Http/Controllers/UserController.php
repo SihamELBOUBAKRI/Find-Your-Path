@@ -10,6 +10,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -23,7 +24,9 @@ class UserController extends Controller
         'comments',
         'reviews',
         'contactRequestsSent',
-        'contactRequestsReceived'
+        'contactRequestsReceived',
+        'personalityType' 
+
     ])->get();
     
     return response()->json($users);
@@ -69,7 +72,8 @@ class UserController extends Controller
             'comments',
             'reviews',
             'contactRequestsSent',
-            'contactRequestsReceived'
+            'contactRequestsReceived',
+            'personalityType' 
         ]);
         
         return response()->json([
@@ -94,7 +98,7 @@ public function update(Request $request, User $user): JsonResponse
         'bio' => 'nullable|string|max:500',
         'linkedin_url' => 'nullable|url|max:255',
         'phone' => 'nullable|string|max:20',
-        'personality_type' => 'nullable|string|max:10',
+        'personality_type_id' => 'nullable|exists:personality_types,id', // Changed
         'recommended_major' => 'nullable|string|max:100',
         'status' => ['nullable', Rule::in(['active', 'inactive', 'banned'])],
         'message_preference' => ['nullable', Rule::in(['open', 'approval_required'])]
@@ -139,7 +143,7 @@ public function update(Request $request, User $user): JsonResponse
             'bio' => 'nullable|string|max:500',
             'linkedin_url' => 'nullable|url|max:255',
             'phone' => 'nullable|string|max:20',
-            'personality_type' => 'nullable|string|max:10',
+            'personality_type_id' => 'nullable|exists:personality_types,id', // Changed
             'recommended_major' => 'nullable|string|max:100',
             'message_preference' => ['nullable', Rule::in(['open', 'approval_required'])]
         ]);
@@ -184,4 +188,40 @@ public function posts(User $user): JsonResponse
         'data' => $posts
     ]);
 }
+public function getByPersonality($personalityTypeId): JsonResponse
+    {
+        $users = User::with('personalityType')
+            ->where('personality_type_id', $personalityTypeId)
+            ->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
+    }
+
+    /**
+     * Update user's personality type (Admin only)
+     */
+    public function updatePersonality(Request $request, User $user): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'personality_type_id' => 'required|exists:personality_types,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user->update(['personality_type_id' => $request->personality_type_id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Personality type updated successfully',
+            'data' => $user->load('personalityType')
+        ]);
+    }
 }
