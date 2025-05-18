@@ -165,6 +165,19 @@ public function show(ContactRequest $contactRequest): JsonResponse
             'status' => $validated['status'],
             'accepted_at' => $validated['status'] === 'accepted' ? now() : null
         ]);
+        // Send notification to the sender
+        $notificationType = $validated['status'] === 'accepted' ? 'Contact Request Accepted' : 'Contact Request Rejected';
+        $notificationMessage = $validated['status'] === 'accepted' 
+            ? auth()->user()->name . ' accepted your contact request'
+            : auth()->user()->name . ' declined your contact request';
+
+        NotificationService::create(
+            $contactRequest->sender,
+            $notificationType,
+            $notificationMessage,
+            'contact',
+            ['request_id' => $contactRequest->id]
+        );
 
         if ($validated['message']) {
             $contactRequest->messages()->create([

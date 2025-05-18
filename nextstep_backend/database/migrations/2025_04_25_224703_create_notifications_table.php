@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title'); // E.g., "New Event Alert"
             $table->text('message');
-            $table->enum('type', ['event', 'message', 'reminder', 'system','contact','comment']);
+            $table->enum('type', ['event', 'message', 'reminder', 'system','contact','comment','like']);
             $table->boolean('is_read')->default(false);
             $table->enum('priority', ['low', 'medium', 'high'])->default('low');
             $table->index(['user_id', 'is_read']);

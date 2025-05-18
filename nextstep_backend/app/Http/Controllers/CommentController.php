@@ -43,16 +43,7 @@ class CommentController extends Controller
             'content' => $validated['content'],
             'parent_id' => $validated['parent_id'] ?? null
         ]);
-        if ($comment->parent_id) {
-            $parentComment = Comment::find($comment->parent_id);
-            NotificationService::create(
-                $parentComment->user,
-                'New Reply',
-                auth()->user()->name . ' replied to your comment',
-                'comment',
-                ['post_id' => $post->id, 'comment_id' => $comment->id]
-            );
-        }
+        if (!$comment->parent_id) {
         NotificationService::create(
             $post->user,
             'New Comment',
@@ -60,6 +51,19 @@ class CommentController extends Controller
             'comment',
             ['post_id' => $post->id, 'comment_id' => $comment->id]
         );
+    }
+    // Only send reply notification if it's a reply to another comment
+    else {
+        $parentComment = Comment::find($comment->parent_id);
+        NotificationService::create(
+            $parentComment->user,
+            'New Reply',
+            auth()->user()->name . ' replied to your comment',
+            'comment',
+            ['post_id' => $post->id, 'comment_id' => $comment->id]
+        );
+    }
+
 
         return response()->json([
             'success' => true,

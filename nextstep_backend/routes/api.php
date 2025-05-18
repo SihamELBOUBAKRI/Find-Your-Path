@@ -158,7 +158,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Contact Requests
     Route::prefix('contact-requests')->group(function () {
-        Route::get('/', [ContactRequestController::class, 'index'])->middleware(['role:admin']);//DONE
+        Route::get('/', [ContactRequestController::class, 'index']);//DONE
         Route::post('/', [ContactRequestController::class, 'store']);//DONE
         Route::post('/{contactRequest}/respond', [ContactRequestController::class, 'respond']);//DONE
         Route::get('/{contactRequest}', [ContactRequestController::class, 'show']);//DONE
