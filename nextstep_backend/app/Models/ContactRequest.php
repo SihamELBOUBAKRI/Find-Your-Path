@@ -6,6 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class ContactRequest extends Model
 {
+    protected $fillable = [
+    'sender_id',
+    'receiver_id',
+    'initial_message',
+    'status',
+    'accepted_at',
+];
+
     // app/Models/ContactRequest.php
 
 public function sender()

@@ -36,6 +36,13 @@ class UserEventController extends Controller
         'status' => $status
     ]);
 
+    $event->user->notifications()->create([
+        'title' => 'New Registration',
+        'message' => $user->name . ' registered for your event: ' . $event->title,
+        'type' => 'event',
+        'data' => ['event_id' => $event->id]
+    ]);
+
     return response()->json([
         'success' => true,
         'message' => 'Successfully registered for event with status: ' . $status,

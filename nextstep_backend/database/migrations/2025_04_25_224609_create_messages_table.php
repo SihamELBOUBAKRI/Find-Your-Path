@@ -19,6 +19,7 @@ return new class extends Migration
            $table->foreignId('contact_request_id')->nullable()->constrained();
            $table->boolean('is_initial_request')->default(false);
            $table->boolean('is_read')->default(false); // Missing read status
+           $table->boolean('is_resend')->default(false);
            $table->timestamps();
        });
     }

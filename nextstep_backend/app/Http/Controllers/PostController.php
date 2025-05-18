@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 use App\Http\Middleware\CheckPostOwner;
 
 class PostController extends Controller
@@ -111,7 +112,15 @@ class PostController extends Controller
 public function like(Post $post): JsonResponse
 {
     $result = $post->toggleLike();
-    
+    if ($result) { // Only if like was added (not removed)
+    NotificationService::create(
+        $post->user,
+        'New Like',
+        auth()->user()->name . ' liked your post',
+        'like',
+        ['post_id' => $post->id]
+    );
+}
     return response()->json([
         'success' => true,
         'message' => $result ? 'Post liked' : 'Post unliked',

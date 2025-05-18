@@ -7,6 +7,7 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 
 class CommentController extends Controller
 {
@@ -42,6 +43,23 @@ class CommentController extends Controller
             'content' => $validated['content'],
             'parent_id' => $validated['parent_id'] ?? null
         ]);
+        if ($comment->parent_id) {
+            $parentComment = Comment::find($comment->parent_id);
+            NotificationService::create(
+                $parentComment->user,
+                'New Reply',
+                auth()->user()->name . ' replied to your comment',
+                'comment',
+                ['post_id' => $post->id, 'comment_id' => $comment->id]
+            );
+        }
+        NotificationService::create(
+            $post->user,
+            'New Comment',
+            auth()->user()->name . ' commented on your post',
+            'comment',
+            ['post_id' => $post->id, 'comment_id' => $comment->id]
+        );
 
         return response()->json([
             'success' => true,

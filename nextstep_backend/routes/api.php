@@ -9,12 +9,16 @@ use App\Http\Controllers\MajorController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\SavedItemController;
 use App\Http\Controllers\UserEventController;
 use App\Http\Controllers\QuizAnswerController;
+use App\Http\Controllers\BlockedUserController;
 use App\Http\Controllers\InstitutionController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\SuccessStoryController;
+use App\Http\Controllers\ContactRequestController;
 use App\Http\Controllers\PersonalityTypeController;
 use App\Http\Controllers\InstitutionMajorController;
 
@@ -142,4 +146,38 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     // Personality Types routes
     Route::apiResource('personality-types', PersonalityTypeController::class);//DONE
+
+    // Messages
+    Route::prefix('messages')->group(function () {
+        Route::get('/{user}', [MessageController::class, 'index']);//DONE
+        Route::post('/', [MessageController::class, 'store']);//DONE
+        Route::post('/mark-read', [MessageController::class, 'markAsRead']);//DONE
+        Route::post('/{message}/resend', [MessageController::class, 'resend']);//DONE
+
+    });
+
+    // Contact Requests
+    Route::prefix('contact-requests')->group(function () {
+        Route::get('/', [ContactRequestController::class, 'index'])->middleware(['role:admin']);//DONE
+        Route::post('/', [ContactRequestController::class, 'store']);//DONE
+        Route::post('/{contactRequest}/respond', [ContactRequestController::class, 'respond']);//DONE
+        Route::get('/{contactRequest}', [ContactRequestController::class, 'show']);//DONE
+
+    });
+    Route::get('/my-contact-requests', [ContactRequestController::class, 'myRequests']);//DONE
+
+
+    // Blocked Users
+    Route::prefix('blocked-users')->group(function () {
+        Route::get('/', [BlockedUserController::class, 'index']);//DONE
+        Route::post('/', [BlockedUserController::class, 'store']);//DONE
+        Route::delete('/{user}', [BlockedUserController::class, 'destroy']);//DONE
+    });
+
+    // Notifications
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::post('/mark-read', [NotificationController::class, 'markAsRead']);
+        Route::delete('/', [NotificationController::class, 'destroy']);
+    });
 });

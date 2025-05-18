@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Review;
 use App\Models\Institution;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 
 class ReviewController extends Controller
 {
@@ -52,6 +53,16 @@ class ReviewController extends Controller
             'user_id' => Auth::id(),
             'is_approved' => false
         ]);
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            NotificationService::create(
+                $admin,
+                'New Review Pending',
+                'A new review for ' . $review->institution->name . ' needs approval',
+                'system',
+                ['review_id' => $review->id]
+            );
+        }
 
         return response()->json([
             'success' => true,
@@ -118,7 +129,13 @@ class ReviewController extends Controller
     $review->is_approved = $validated['is_approved'];
     $review->save();
     $review->refresh(); // Force refresh from database
-
+    NotificationService::create(
+        $review->user,
+        'Review ' . ($validated['is_approved'] ? 'Approved' : 'Rejected'),
+        'Your review for ' . $review->institution->name . ' was ' . ($validated['is_approved'] ? 'approved' : 'rejected'),
+        'system',
+        ['review_id' => $review->id]
+    );
     return response()->json([
         'success' => true,
         'message' => $validated['is_approved'] ? 'Review approved' : 'Review unapproved',
