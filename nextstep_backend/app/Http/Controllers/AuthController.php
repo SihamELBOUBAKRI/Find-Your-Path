@@ -17,45 +17,49 @@ class AuthController extends Controller
     /**
      * Register a new user
      */
-    public function register(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        'avatar' => 'nullable|string|url',
-        'bio' => 'nullable|string|max:500',
-        'linkedin_url' => 'nullable|url|max:255',
-        'phone' => 'nullable|string|max:20',
-    ]);
+     public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Changed to accept image files
+            'bio' => 'nullable|string|max:500',
+            'linkedin_url' => 'nullable|url|max:255',
+            'phone' => 'nullable|string|max:20',
+        ]);
 
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'avatar' => $request->avatar,
-        'bio' => $request->bio,
-        'linkedin_url' => $request->linkedin_url,
-        'phone' => $request->phone,
-    ]);
+        $userData = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'bio' => $request->bio,
+            'linkedin_url' => $request->linkedin_url,
+            'phone' => $request->phone,
+        ];
 
-    // Create token with abilities
-    $token = $user->createToken('auth_token', ['*'])->plainTextToken;
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('public/avatars');
+            $userData['avatar'] = str_replace('public/', 'storage/', $path);
+        }
 
-    return response()->json([
-        'message' => 'User registered successfully',
-        'access_token' => $token,
-        'user' => $user
-    ], 201);
-}
+        $user = User::create($userData);
+
+        // Create token with abilities
+        $token = $user->createToken('auth_token', ['*'])->plainTextToken;
+
+        return response()->json([
+            'message' => 'User registered successfully',
+            'access_token' => $token,
+            'user' => $user
+        ], 201);
+    }
 
     /**
      * Login user and create token
      */
-    /**
- * Login user and create token
- */
-public function login(Request $request)
+    public function login(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -298,5 +302,35 @@ public function deactivateAccount(Request $request)
         ]);
     }
 
-    
+  public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+        
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'bio' => 'nullable|string|max:500',
+            'linkedin_url' => 'nullable|url|max:255',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar if exists
+            if ($user->avatar) {
+                Storage::delete(str_replace('storage/', 'public/', $user->avatar));
+            }
+            
+            $path = $request->file('avatar')->store('public/avatars');
+            $validated['avatar'] = str_replace('public/', 'storage/', $path);
+        }
+
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $user->fresh()
+        ]);
+    }
 }

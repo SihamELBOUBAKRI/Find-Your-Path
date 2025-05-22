@@ -27,6 +27,7 @@ Route::post('/users', [UserController::class, 'store']); //DONE
 Route::post('/register', [AuthController::class, 'register']);//DONE
 Route::post('/login', [AuthController::class, 'login']);//DONE
 Route::post('/restore-account', [AuthController::class, 'reactivateAccount']);
+Route::apiResource('institutions', InstitutionController::class);//DONE
 
 
 
@@ -52,7 +53,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     ->middleware(['role:admin']);
 
     // Institution routes
-    Route::apiResource('institutions', InstitutionController::class);//DONE
     Route::get('/institutions/{institution}/majors', [InstitutionController::class, 'majors']);//DONE
     Route::get('/institutions/{institution}/events', [InstitutionController::class, 'events']);//DONE
     
