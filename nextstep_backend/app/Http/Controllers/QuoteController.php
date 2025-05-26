@@ -94,4 +94,23 @@ class QuoteController extends Controller
             'message' => 'Quote deleted successfully.'
         ]);
     }
+
+
+    public function random()
+{
+    $quote = Quote::inRandomOrder()->first();
+
+    if (!$quote) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No quotes available'
+        ], 404);
+    }
+
+    return response()->json([
+        'success' => true,
+        'data' => $quote,
+        'message' => 'Random quote retrieved successfully'
+    ]);
+}
 }

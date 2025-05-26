@@ -148,6 +148,9 @@ public function index(Request $request, $userId): JsonResponse
     /**
  * Resend a message (only if not read yet)
  */
+/**
+ * Resend a message (only if not read yet)
+ */
 public function resend(Request $request, Message $message): JsonResponse
 {
     // Verify the message belongs to the authenticated user
@@ -166,20 +169,48 @@ public function resend(Request $request, Message $message): JsonResponse
         ], 400);
     }
 
-    // Create a new message with resend indicator
-    $resendMessage = Message::create([
-        'sender_id' => Auth::id(),
-        'receiver_id' => $message->receiver_id,
-        'content' => $message->content,
-        'contact_request_id' => $message->contact_request_id,
+    // Update the existing message
+    $message->update([
+        'content' => "[This message was deleted and resent] " . $message->content,
         'is_resend' => true,
-        'original_message_id' => $message->id
+        'updated_at' => now()
     ]);
 
     return response()->json([
         'success' => true,
         'message' => 'Message resent successfully',
-        'data' => $resendMessage->load('receiver')
-    ], 201);
+        'data' => $message->load('receiver')
+    ]);
+}
+public function conversations(): JsonResponse
+{
+    try {
+        // Get distinct conversation partners
+        $conversations = Message::where('sender_id', Auth::id())
+            ->orWhere('receiver_id', Auth::id())
+            ->with(['sender', 'receiver'])
+            ->get()
+            ->map(function ($message) {
+                // Return the other user in the conversation
+                return $message->sender_id === Auth::id() 
+                    ? $message->receiver 
+                    : $message->sender;
+            })
+            ->unique('id')
+            ->values() // Reset array keys
+            ->toArray(); // Convert to array
+
+        return response()->json([
+            'success' => true,
+            'data' => $conversations ?: [] // Ensure empty array if no conversations
+        ]);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'success' => false,
+            'data' => [],
+            'message' => 'Failed to fetch conversations'
+        ], 500);
+    }
 }
 }

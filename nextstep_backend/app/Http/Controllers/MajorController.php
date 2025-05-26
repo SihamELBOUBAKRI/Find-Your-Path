@@ -27,7 +27,7 @@ class MajorController extends Controller
             $sortField = $request->get('sort_by', 'name');
             $sortDirection = $request->get('sort_dir', 'asc');
             
-            $majors = $query->orderBy($sortField, $sortDirection)->paginate(10);
+            $majors = $query->orderBy($sortField, $sortDirection)->get();
             
             return response()->json([
                 'success' => true,

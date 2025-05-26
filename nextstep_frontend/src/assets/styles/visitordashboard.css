@@ -1,0 +1,205 @@
+/* dashboard.css (updated) */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.minimal-dashboard {
+  position: fixed; 
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-image: url('../images/background.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 40px;
+}
+.login-card {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 30px;
+  width: 350px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.login-card h2 {
+  margin-bottom: 20px;
+  color: #1a237e;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #1a237e;
+  font-size: 0.9rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: rgba(49, 130, 206, 0.8);
+  color: #1a237e;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-button:hover {
+  background-color: rgba(44, 82, 130, 0.9);
+}
+
+.signup-link {
+  margin-top: 15px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.7rem;
+}
+
+.signup-link a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+.login-error {
+  color: #ffcccc;
+  background-color: rgba(229, 62, 62, 0.2);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 0.9rem;
+  border: 1px solid rgba(229, 62, 62, 0.3);
+}
+.platform-logo-cont {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 10;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.platform-title-cont {
+  display: flex;
+  flex-direction: column;
+}
+
+.platform-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin: 0;
+  line-height: 1.2;  
+}
+.platform-text {
+  position: absolute;
+  top: 47%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  width: 80%; /* Control the width to allow wrapping */
+  max-width: 600px; /* Maximum width before wrapping */
+  text-align: center;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  padding: 0 20px;
+  word-wrap: break-word; /* Ensures long words will wrap */
+  white-space: normal; /* Allows text to wrap normally */
+}
+/* Add to your CSS file */
+.forgot-password-container,
+.reset-password-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.forgot-password-link a{
+  color: aliceblue;
+  font-size: 10px;
+  text-decoration: none;
+}
+.forgot-password-link a:hover{
+    text-decoration: underline;
+}
+
+.success-message {
+  color: green;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 1rem;
+}
+@media (max-width: 768px) {
+  .minimal-dashboard {
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-card {
+    width: 90%;
+    max-width: 350px;
+  }
+  .platform-name {
+    font-size: 1.2rem;
+  }
+  
+  .platform-text {
+    font-size: 1.2rem;
+    margin-top: -80px;
+  }
+}

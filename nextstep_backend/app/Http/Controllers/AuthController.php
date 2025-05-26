@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Mail\PasswordResetMail;
 use Illuminate\Validation\Rules;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Auth\Events\PasswordReset;
 
 class AuthController extends Controller
 {
@@ -174,16 +178,18 @@ public function forgotPassword(Request $request)
 {
     $request->validate(['email' => 'required|email']);
 
-    // We will send the password reset link to this user. Once we have attempted
-    // to send the link, we will examine the response then see the message we
-    // need to show to the user. Finally, we'll send out a proper response.
-    $status = Password::sendResetLink(
-        $request->only('email')
-    );
+    $user = User::where('email', $request->email)->first();
 
-    return $status === Password::RESET_LINK_SENT
-        ? response()->json(['message' => __($status)])
-        : response()->json(['message' => __($status)], 422);
+    if (!$user) {
+        return response()->json(['message' => 'If this email exists, a reset link has been sent']);
+    }
+
+    $token = Password::createToken($user);
+    $resetUrl = env('FRONTEND_URL') . '/reset-password/' . $token . '?email=' . urlencode($user->email);
+
+    Mail::to($user->email)->send(new PasswordResetMail($resetUrl));
+
+    return response()->json(['message' => 'Password reset link sent']);
 }
 
 /**
@@ -197,9 +203,6 @@ public function resetPassword(Request $request)
         'password' => ['required', 'confirmed', Rules\Password::defaults()],
     ]);
 
-    // Here we will attempt to reset the user's password. If it is successful we
-    // will update the password on an actual user model and persist it to the
-    // database. Otherwise we will parse the error and return the response.
     $status = Password::reset(
         $request->only('email', 'password', 'password_confirmation', 'token'),
         function ($user, $password) {
@@ -208,15 +211,27 @@ public function resetPassword(Request $request)
             ])->setRememberToken(Str::random(60));
 
             $user->save();
-
-            // Revoke all tokens when password is reset
-            $user->tokens()->delete();
+            event(new PasswordReset($user));
         }
     );
 
-    return $status === Password::PASSWORD_RESET
-        ? response()->json(['message' => __($status)])
-        : response()->json(['message' => __($status)], 422);
+    if ($status == Password::PASSWORD_RESET) {
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => __($status),
+                'redirect_url' => env('FRONTEND_LOGIN_URL') // Add this
+            ]);
+        }
+        
+        // Redirect to React login page
+        return redirect(env('FRONTEND_LOGIN_URL') . '?reset_success=true');
+    } else {
+        if ($request->wantsJson()) {
+            return response()->json(['message' => __($status)], 422);
+        }
+        
+        return back()->withErrors(['email' => __($status)]);
+    }
 }
 
 /**
@@ -302,35 +317,4 @@ public function deactivateAccount(Request $request)
         ]);
     }
 
-  public function updateProfile(Request $request)
-    {
-        $user = $request->user();
-        
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'bio' => 'nullable|string|max:500',
-            'linkedin_url' => 'nullable|url|max:255',
-            'phone' => 'nullable|string|max:20',
-        ]);
-
-        // Handle avatar upload
-        if ($request->hasFile('avatar')) {
-            // Delete old avatar if exists
-            if ($user->avatar) {
-                Storage::delete(str_replace('storage/', 'public/', $user->avatar));
-            }
-            
-            $path = $request->file('avatar')->store('public/avatars');
-            $validated['avatar'] = str_replace('public/', 'storage/', $path);
-        }
-
-        $user->update($validated);
-
-        return response()->json([
-            'message' => 'Profile updated successfully',
-            'user' => $user->fresh()
-        ]);
-    }
 }

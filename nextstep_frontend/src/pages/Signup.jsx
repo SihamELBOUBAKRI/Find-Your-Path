@@ -71,7 +71,7 @@ const Signup = () => {
 
             localStorage.setItem('token', response.data.access_token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
-            navigate('/dashboard');
+            navigate('/login');
         } catch (err) {
             if (err.response?.status === 422) {
                 setErrors(err.response.data.errors || {});

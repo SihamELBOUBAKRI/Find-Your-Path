@@ -6,8 +6,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/reset-password/{token}', function ($token) {
-    return response()->json([
-        'token' => $token,
-        'message' => 'Use this token with your frontend reset form'
-    ]);
+    return view('auth.reset-password', ['token' => $token]);
 })->name('password.reset');

@@ -23,13 +23,11 @@ use App\Http\Controllers\PersonalityTypeController;
 use App\Http\Controllers\InstitutionMajorController;
 
 // Public routes (no authentication required)
-Route::post('/users', [UserController::class, 'store']); //DONE
 Route::post('/register', [AuthController::class, 'register']);//DONE
 Route::post('/login', [AuthController::class, 'login']);//DONE
-Route::post('/restore-account', [AuthController::class, 'reactivateAccount']);
-Route::apiResource('institutions', InstitutionController::class);//DONE
-
-
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);//DONE
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+    ->name('password.update');
 
 
 // Authenticated routes (Sanctum protected)
@@ -38,43 +36,78 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);//DONE
     Route::post('/change-password', [AuthController::class, 'changePassword']);//DONE
-    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);//DONE
-    Route::post('/reset-password', [AuthController::class, 'resetPassword']);//DONE
     Route::post('/delete-account', [AuthController::class, 'deactivateAccount']);
-    
+    Route::post('/restore-account', [AuthController::class, 'reactivateAccount']);
+
 
     // User routes
-    Route::apiResource('users', UserController::class)->except(['store']);//DONE
+    Route::get('/users', [UserController::class, 'index']); 
+    Route::get('/users/{user}', [UserController::class, 'show']); 
+    Route::middleware(['role:admin'])->group(function () {
+        Route::post('/users', [UserController::class, 'store']);
+        Route::put('/users/{user}', [UserController::class, 'update']); 
+        Route::delete('/users/{user}', [UserController::class, 'destroy']);
+        Route::patch('users/{user}/personality', [UserController::class, 'updatePersonality']);
+    });
     Route::put('/profile', [UserController::class, 'updateProfile']);//DONE
     Route::get('/users/{user}/saved-items', [UserController::class, 'savedItems']);//DONE
     Route::get('/users/{user}/posts', [UserController::class, 'posts']);//DONE
     Route::get('users/by-personality/{type}', [UserController::class, 'getByPersonality']);
-    Route::patch('users/{user}/personality', [UserController::class, 'updatePersonality'])
-    ->middleware(['role:admin']);
 
     // Institution routes
-    Route::get('/institutions/{institution}/majors', [InstitutionController::class, 'majors']);//DONE
-    Route::get('/institutions/{institution}/events', [InstitutionController::class, 'events']);//DONE
-    
+    Route::get('/institutions', [InstitutionController::class, 'index']);
+    Route::get('/institutions/{institution}', [InstitutionController::class, 'show']);
+    Route::get('/institutions/{institution}/majors', [InstitutionController::class, 'majors']);
+    Route::get('/institutions/{institution}/events', [InstitutionController::class, 'events']);
+    Route::middleware(['role:admin'])->group(function () {
+        Route::post('/institutions', [InstitutionController::class, 'store']);
+        Route::put('/institutions/{institution}', [InstitutionController::class, 'update']);
+        Route::delete('/institutions/{institution}', [InstitutionController::class, 'destroy']);
+        
+    });    
+
     // major routes
-    Route::apiResource('majors', MajorController::class);
-    Route::get('majors/{major}/institutions', [MajorController::class, 'institutions']);
+    Route::get('/majors', [MajorController::class, 'index']);
+    Route::get('/majors/{major}', [MajorController::class, 'show']);
+    Route::get('/majors/{major}/institutions', [MajorController::class, 'institutions']); 
+    Route::middleware(['role:admin'])->group(function () {
+        Route::post('/majors', [MajorController::class, 'store']);
+        Route::put('/majors/{major}', [MajorController::class, 'update']);
+        Route::delete('/majors/{major}', [MajorController::class, 'destroy']);
+    });
 
     // events routes
-    Route::apiResource('events', EventController::class);//DONE    
+    Route::get('/events', [EventController::class, 'index']); 
+    Route::get('/events/{event}', [EventController::class, 'show']);
+    Route::middleware(['role:admin,mentor'])->group(function () {
+        Route::post('/events', [EventController::class, 'store']);
+        Route::put('/events/{event}', [EventController::class, 'update']);
+        Route::delete('/events/{event}', [EventController::class, 'destroy']);
+    });
 
     // success-stories routes
-    Route::apiResource('success-stories', SuccessStoryController::class);//DONE
-    Route::get('success-stories/by-major/{major}', [SuccessStoryController::class, 'byMajor']);//DONE
-    Route::get('success-stories/by-institution/{institution}', [SuccessStoryController::class, 'byInstitution']);//DONE
-    Route::get('success-stories/{slug}', [SuccessStoryController::class, 'show'])->where('slug', '[A-Za-z0-9-]+');//DONE
+    Route::get('/success-stories', [SuccessStoryController::class, 'index']);
+    Route::get('/success-stories/{slug}', [SuccessStoryController::class, 'show'])->where('slug', '[A-Za-z0-9-]+');
+    Route::get('/success-stories/by-major/{major}', [SuccessStoryController::class, 'byMajor']);
+    Route::get('/success-stories/by-institution/{institution}', [SuccessStoryController::class, 'byInstitution']);
+    Route::middleware(['role:admin'])->group(function () {
+        Route::post('/success-stories', [SuccessStoryController::class, 'store']);
+        Route::put('/success-stories/{story}', [SuccessStoryController::class, 'update']);
+        Route::delete('/success-stories/{story}', [SuccessStoryController::class, 'destroy']);
+    });
 
     // quotes routes
-    Route::apiResource('quotes', QuoteController::class);//DONE
+    Route::get('/quotes', [QuoteController::class, 'index']);
+    Route::get('/quotes/random', [QuoteController::class, 'random']);
+    Route::get('/quotes/{quote}', [QuoteController::class, 'show']);
+    Route::middleware(['auth:sanctum', 'role:admin,mentor'])->group(function () {
+        Route::post('/quotes', [QuoteController::class, 'store']);
+        Route::put('/quotes/{quote}', [QuoteController::class, 'update']);
+        Route::delete('/quotes/{quote}', [QuoteController::class, 'destroy']);
+    });
 
     // reviews routes
-    Route::apiResource('reviews', ReviewController::class)->except(['update']);//DONE
-    Route::patch('/reviews/{review}', [ReviewController::class, 'update']);//DONE
+    Route::apiResource('reviews', ReviewController::class);//DONE
     Route::middleware('role:admin')->group(function () {
         Route::patch('/reviews/{review}/approve', [ReviewController::class, 'approve']);//DONE
         Route::delete('/reviews/{review}/admin', [ReviewController::class, 'adminDestroy']);
@@ -82,23 +115,32 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
     // UserEvent pivot table  Registration management
-    Route::post('/events/{event}/register', [UserEventController::class, 'register']);//DONE
-    Route::get('/events/{event}/users/{user}/verify', [UserEventController::class, 'verifyRegistration'])
-    ->middleware('role:admin');//DONE
-    Route::patch('/events/{event}/users/{user}/status', [UserEventController::class, 'updateStatus']);//DONE
-    Route::delete('/events/{event}/users/{user}', [UserEventController::class, 'cancelRegistration']);//DONE
-    Route::get('/events/{event}/registrations', [UserEventController::class, 'eventRegistrations']);//DONE
-    Route::get('/users/{user}/registrations', [UserEventController::class, 'userRegistrations']);//DONE
-    Route::get('/events/{event}/users/{user}/check', [UserEventController::class, 'checkRegistration']);//DONE
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('/events/{event}/register', [UserEventController::class, 'register']);
+        Route::delete('/events/{event}/users/{user}', [UserEventController::class, 'cancelRegistration'])
+            ->middleware('check.registration.owner');
+        Route::get('/events/{event}/users/{user}/check', [UserEventController::class, 'checkRegistration']);
+        Route::get('/users/{user}/registrations', [UserEventController::class, 'userRegistrations'])
+            ->middleware('check.user.access');
+        Route::middleware('role:admin')->group(function () {
+            Route::get('/events/{event}/users/{user}/verify', [UserEventController::class, 'verifyRegistration']);
+            Route::patch('/events/{event}/users/{user}/status', [UserEventController::class, 'updateStatus']);
+            Route::get('/events/{event}/registrations', [UserEventController::class, 'eventRegistrations']);
+        });
+    });
+
     // institution-majors routes
     Route::prefix('institution-majors')->group(function () {
-        Route::post('/', [InstitutionMajorController::class, 'store']);//DONE
-        Route::get('/institutions/{institution}', [InstitutionMajorController::class, 'institutionMajors']);//DONE
-        Route::get('/majors/{major}', [InstitutionMajorController::class, 'majorInstitutions']);//DONE
-        Route::get('/{institution}/{major}', [InstitutionMajorController::class, 'show']);//DONE
-        Route::put('/{institution}/{major}', [InstitutionMajorController::class, 'update']);//DONE
-        Route::delete('/{institution}/{major}', [InstitutionMajorController::class, 'destroy']);//DONE
+    Route::get('/institutions/{institution}', [InstitutionMajorController::class, 'institutionMajors']);
+    Route::get('/majors/{major}', [InstitutionMajorController::class, 'majorInstitutions']);
+    Route::get('/{institution}/{major}', [InstitutionMajorController::class, 'show']);
+    Route::middleware(['role:admin'])->group(function () {
+            Route::post('/', [InstitutionMajorController::class, 'store']);
+            Route::put('/{institution}/{major}', [InstitutionMajorController::class, 'update']);
+            Route::delete('/{institution}/{major}', [InstitutionMajorController::class, 'destroy']);
+        });
     });
+
     // posts routes
     Route::apiResource('posts', PostController::class)->except(['destroy','update']);//DONE
     Route::post('/posts/{post}/like', [PostController::class, 'like']);//DONE
@@ -107,12 +149,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/posts/{post}', [PostController::class, 'destroy']);//DONE
     });
     // comments routes
-    Route::apiResource('posts.comments', CommentController::class)
-        ->only(['index', 'store']);//DONE
-    Route::delete('posts/{post}/comments/{comment}', [CommentController::class, 'destroy'])
-    ->middleware(['comment.owner'])->scopeBindings();//DONE
-    Route::put('posts/{post}/comments/{comment}', [CommentController::class, 'update'])
-    ->middleware(['comment.owner'])->scopeBindings();//DONE
+    Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
+    Route::middleware(['comment.owner'])->group(function () {
+        Route::put('/posts/{post}/comments/{comment}', [CommentController::class, 'update'])
+            ->scopeBindings();
+        Route::delete('/posts/{post}/comments/{comment}', [CommentController::class, 'destroy'])
+            ->scopeBindings();
+    });
 
     // SavedItemController routes
     Route::get('/saved-items', [SavedItemController::class, 'index']);//DONE
@@ -123,32 +167,40 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
 
     // Quiz Questions
-    Route::apiResource('questions', QuizQuestionController::class)->except(['update']);//DONE
-    Route::patch('questions/{question}', [QuizQuestionController::class, 'update']);//DONE
-    Route::post('questions/{question}/mappings', [QuizQuestionController::class, 'addPersonalityMapping'])
-    ->middleware(['role:admin']);//DONE
-    Route::get('/questions/{question}/mappings', [QuizQuestionController::class, 'getPersonalityMappings'])
-    ->middleware(['role:admin']);//DONE
-   
-
-    // Quiz Answers
-    Route::post('/quiz/answers', [QuizAnswerController::class, 'store']);//DONE
-    Route::get('quiz/personality-analysis', [QuizAnswerController::class, 'personalityAnalysis']);//DONE
-    
-    // Admin-only endpoints
-    Route::middleware('role:admin')->group(function () {
-        Route::get('/quiz/answers', [QuizAnswerController::class, 'index']);//DONE
-        Route::get('/quiz/answers/{answer}', [QuizAnswerController::class, 'show']);//DONE
-        Route::put('/quiz/answers/{answer}', [QuizAnswerController::class, 'update']);//DONE
-        Route::delete('/quiz/answers/{answer}', [QuizAnswerController::class, 'destroy']);//DONE
-        Route::get('/quiz/answers/user/{userId}', [QuizAnswerController::class, 'getUserAnswers']);//DONE
-
+    Route::get('/questions', [QuizQuestionController::class, 'index']);
+    Route::get('/questions/{question}', [QuizQuestionController::class, 'show']);
+    Route::middleware(['role:admin'])->group(function () {
+        Route::post('/questions', [QuizQuestionController::class, 'store']);
+        Route::patch('/questions/{question}', [QuizQuestionController::class, 'update']);
+        Route::delete('/questions/{question}', [QuizQuestionController::class, 'destroy']);
+        Route::post('/questions/{question}/mappings', [QuizQuestionController::class, 'addPersonalityMapping']);
+        Route::get('/questions/{question}/mappings', [QuizQuestionController::class, 'getPersonalityMappings']);
     });
-    // Personality Types routes
-    Route::apiResource('personality-types', PersonalityTypeController::class);//DONE
+
+   // Quiz Answers Routes
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('/quiz/answers', [QuizAnswerController::class, 'store']);
+        Route::get('/quiz/personality-analysis', [QuizAnswerController::class, 'personalityAnalysis']);
+        Route::middleware('role:admin')->group(function () {
+            Route::get('/quiz/answers', [QuizAnswerController::class, 'index']);
+            Route::get('/quiz/answers/{answer}', [QuizAnswerController::class, 'show']);
+            Route::put('/quiz/answers/{answer}', [QuizAnswerController::class, 'update']);
+            Route::delete('/quiz/answers/{answer}', [QuizAnswerController::class, 'destroy']);
+            Route::get('/quiz/answers/user/{user}', [QuizAnswerController::class, 'getUserAnswers']);
+        });
+    });
+
+    // Personality Types Routes
+    Route::apiResource('personality-types', PersonalityTypeController::class)
+        ->only(['index', 'show']); 
+    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+        Route::apiResource('personality-types', PersonalityTypeController::class)
+            ->except(['index', 'show']);
+    });
 
     // Messages
     Route::prefix('messages')->group(function () {
+        Route::get('/conversations', [MessageController::class, 'conversations']);
         Route::get('/{user}', [MessageController::class, 'index']);//DONE
         Route::post('/', [MessageController::class, 'store']);//DONE
         Route::post('/mark-read', [MessageController::class, 'markAsRead']);//DONE
