@@ -1,0 +1,265 @@
+/* Root Theme Variables */
+:root {
+  --bg: #f9fafb;
+  --card-bg: #ffffffcc;
+  --text: #1e293b;
+  --muted: #64748b;
+  --primary: #6366f1;
+  --badge-bg: #e0e7ff;
+  --description: #475569;
+  --hover-card: rgba(0, 0, 0, 0.06);
+  --btn-bg: linear-gradient(to right, #6a11cb, #2575fc);
+  --btn-hover-bg: linear-gradient(to right, #5a01bb, #1f65e0);
+  --icon-bg: #ffffff;
+  --icon-color: #f87171;
+}
+
+/* Dark Mode Override */
+.dark {
+  --bg: #0f172a;
+  --card-bg: #1e293bcc;
+  --text: #f8fafc;
+  --muted: #cbd5e1;
+  --primary: #a5b4fc;
+  --badge-bg: #334155;
+  --description: #94a3b8;
+  --hover-card: rgba(255, 255, 255, 0.05);
+  --btn-bg: linear-gradient(to right, #4f46e5, #3b82f6);
+  --btn-hover-bg: linear-gradient(to right, #4338ca, #2563eb);
+  --icon-bg: #1e293b;
+  --icon-color: #fb7185;
+}
+
+/* Page Background */
+.institutions-page {
+  padding: 2rem;
+  background: var(--bg);
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Filters */
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 14px var(--hover-card);
+}
+
+.search-box {
+  flex: 2;
+  position: relative;
+  min-width: 200px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.65rem 2.5rem;
+  border-radius: 2rem;
+  border: none;
+  font-size: 0.95rem;
+  background: var(--card-bg);
+  color: var(--text);
+  transition: 0.3s ease;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: var(--muted);
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.filter-group select,
+.filter-group input {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 1rem;
+  border: none;
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+/* Grid */
+.institutions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Institution Card */
+.institution-card ,.event-card{
+  background: var(--card-bg);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 16px var(--hover-card);
+  transition: 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+  max-height: 300px;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.institution-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px var(--hover-card);
+}
+
+/* Smaller Image */
+.card-image {
+  position: relative;
+  height: 110px;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Heart Icon */
+.save-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  background: var(--icon-bg);
+  color: var(--icon-color);
+  border: none;
+  padding: 0.45rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.save-btn:hover {
+  background: var(--icon-color);
+  color: white;
+}
+
+/* Card Body */
+.card-body {
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.card-body h3 {
+  font-size: 1rem;
+  margin: 0;
+  color: var(--text);
+}
+
+.institution-type {
+  background-color: var(--badge-bg);
+  color: var(--primary);
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  text-transform: capitalize;
+  width: fit-content;
+}
+
+.location {
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.description {
+  font-size: 0.8rem;
+  color: var(--description);
+  flex: 1;
+  margin-top: 0.4rem;
+  line-height: 1.2;
+  overflow: hidden;
+}
+
+.det-btn {
+  margin-top: auto;
+  background: var(--btn-bg);
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.view-btn:hover {
+  background: var(--btn-hover-bg);
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .filters-container {
+    flex-direction: column;
+  }
+
+  .institutions-grid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  }
+
+  .institution-card {
+    max-height: 320px;
+  }
+}
+/* Favorite Button Styles */
+.save-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  background: var(--icon-bg);
+  color: var(--muted); /* Default color */
+  border: none;
+  padding: 0.45rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  background: var(--icon-color);
+  color: white;
+}
+
+.save-btn.active {
+  color: var(--icon-color);
+  background: var(--icon-bg);
+}
+
+.save-btn.active:hover {
+  color: white;
+  background: var(--icon-color);
+}
+
+/* Dark mode adjustments for favorites */
+.dark .save-btn {
+  color: #cbd5e1;
+}
+
+.dark .save-btn.active {
+  color: var(--icon-color);
+}

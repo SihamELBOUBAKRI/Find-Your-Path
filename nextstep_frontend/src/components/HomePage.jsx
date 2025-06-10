@@ -55,7 +55,6 @@ const HomePage = () => {
     setMajors([]); 
   }
 };
-console.log(filteredStories);
 
   // Fetch institutions
   const fetchInstitutions = async () => {
@@ -176,7 +175,6 @@ console.log(filteredStories);
                     </div>
                     <div className="story-info">
                     <h3 className="story-name">{story.name}</h3>
-                    <p className="story-meta">{story.major} at {story.institution}</p>
                     </div>
                 </div>
 

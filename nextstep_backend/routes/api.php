@@ -169,11 +169,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Quiz Questions
     Route::get('/questions', [QuizQuestionController::class, 'index']);
     Route::get('/questions/{question}', [QuizQuestionController::class, 'show']);
+    Route::post('/questions/{question}/mappings', [QuizQuestionController::class, 'addPersonalityMapping']);
+
     Route::middleware(['role:admin'])->group(function () {
         Route::post('/questions', [QuizQuestionController::class, 'store']);
         Route::patch('/questions/{question}', [QuizQuestionController::class, 'update']);
         Route::delete('/questions/{question}', [QuizQuestionController::class, 'destroy']);
-        Route::post('/questions/{question}/mappings', [QuizQuestionController::class, 'addPersonalityMapping']);
         Route::get('/questions/{question}/mappings', [QuizQuestionController::class, 'getPersonalityMappings']);
     });
 

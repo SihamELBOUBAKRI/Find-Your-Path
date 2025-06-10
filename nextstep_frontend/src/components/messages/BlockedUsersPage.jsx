@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import api from '../api';
-import '../assets/styles/BlockedUsersPage.css';
+import api from '../../api';
+import '../../assets/styles/BlockedUsersPage.css';
 
 const BlockedUsersPage = () => {
   const [blockedUsers, setBlockedUsers] = useState([]);

@@ -1,25 +1,33 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FiSun, FiMoon, FiBell, FiSearch, FiLogOut, FiUser, FiMenu } from 'react-icons/fi';
+import { FiSun, FiMoon, FiBell, FiSearch, FiLogOut, FiUser, FiMenu, FiX } from 'react-icons/fi';
 import eventsIcon from '../../assets/images/event.png';
 import homeIcon from '../../assets/images/institution.png';
 import messagesIcon from '../../assets/images/chat.png';
 import brainIcon from '../../assets/images/brain.png';
 import userIcon from '../../assets/images/user.png';
 import wishlistIcon from '../../assets/images/wishlist.png';
+import connectionIcom from '../../assets/images/connection.png';
+import postIcom from '../../assets/images/post.png';
 import '../../assets/styles/dashboard.css';
 import logoGif from '../../assets/images/logo.gif';
 import { Outlet } from 'react-router-dom';
+import api from '../../api';
 
 const StudentDashboard = () => {
   const [expanded, setExpanded] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const navbarRef = useRef(null);
   const profileRef = useRef(null);
+  const notificationsRef = useRef(null);
 
   const navItems = [
     { icon: <img src={userIcon} alt="profile" className="nav-icon-img" />, title: 'Profile', path: 'profile' },
@@ -27,10 +35,38 @@ const StudentDashboard = () => {
     { icon: <img src={eventsIcon} alt="events" className="nav-icon-img" />, title: 'Events', path: 'events' },
     { icon: <img src={messagesIcon} alt="messages" className="nav-icon-img" />, title: 'Messages', path: 'messages' },
     { icon: <img src={brainIcon} alt="core_type" className="nav-icon-img" />, title: 'Core Type', path: 'core-type' },
-    { icon: <img src={wishlistIcon} alt="saved_items" className="nav-icon-img" />, title: 'Saved Items', path: 'saved-items' }
+    { icon: <img src={wishlistIcon} alt="saved_items" className="nav-icon-img" />, title: 'Saved Items', path: 'saved-items' },
+    { icon: <img src={connectionIcom} alt="connection" className="nav-icon-img" />, title: 'connections', path: 'connections' },
+    { icon: <img src={postIcom} alt="posts" className="nav-icon-img" />, title: 'posts', path: 'posts' }
   ];
 
-  // Close dropdown when clicking outside
+  // Fetch notifications
+  useEffect(() => {
+   const fetchNotifications = async () => {
+  try {
+    setLoadingNotifications(true);
+    const response = await api.get('/notifications', {
+      params: { unread: true }
+    });
+    
+    // Extract the notifications array from the paginated response
+    const notificationsData = response.data.data?.data || [];
+    
+    setNotifications(notificationsData);
+    setUnreadCount(notificationsData.filter(n => !n.is_read).length);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    setNotifications([]); // Fallback to empty array
+    setUnreadCount(0);
+  } finally {
+    setLoadingNotifications(false);
+  }
+};
+
+    fetchNotifications();
+  }, []);
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (expanded && navbarRef.current && !navbarRef.current.contains(event.target)) {
@@ -39,11 +75,14 @@ const StudentDashboard = () => {
       if (showProfileDropdown && profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfileDropdown(false);
       }
+      if (showNotifications && notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [expanded, showProfileDropdown]);
+  }, [expanded, showProfileDropdown, showNotifications]);
 
   const handleNavItemClick = (path) => {
     navigate(path);
@@ -63,6 +102,40 @@ const StudentDashboard = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
+  };
+
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications);
+    if (!showNotifications) {
+      markNotificationsAsRead();
+    }
+  };
+
+  const markNotificationsAsRead = async () => {
+    const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id);
+    if (unreadIds.length === 0) return;
+
+    try {
+      await api.post('/notifications/mark-as-read', {
+        notification_ids: unreadIds
+      });
+      setNotifications(notifications.map(n => ({ ...n, is_read: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+    }
+  };
+
+  const deleteNotification = async (id) => {
+    try {
+      await api.delete('/notifications', {
+        data: { notification_ids: [id] }
+      });
+      setNotifications(notifications.filter(n => n.id !== id));
+      setUnreadCount(prev => prev - 1);
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
   };
 
   return (
@@ -99,10 +172,12 @@ const StudentDashboard = () => {
             {darkMode ? <FiSun /> : <FiMoon />}
           </button>
           
-          <div className="notifications-wrapper">
-            <button className="notifications">
+          <div className="notifications-wrapper" ref={notificationsRef}>
+            <button className="notifications" onClick={toggleNotifications}>
               <FiBell />
-              <span className="notification-badge">2</span>
+              {unreadCount > 0 && (
+                <span className="notification-badge">{unreadCount}</span>
+              )}
             </button>
           </div>
           
@@ -130,23 +205,61 @@ const StudentDashboard = () => {
         </div>
       </nav>
 
+      {/* Notifications Offcanvas */}
+      <div className={`notifications-offcanvas ${showNotifications ? 'show' : ''}`}>
+        <div className="offcanvas-header">
+          <h3>Notifications</h3>
+          <button className="close-btn" onClick={() => setShowNotifications(false)}>
+            <FiX />
+          </button>
+        </div>
+        
+        <div className="notifications-list">
+          {loadingNotifications ? (
+            <div className="loading-notifications">Loading notifications...</div>
+          ) : notifications.length === 0 ? (
+            <div className="no-notifications">No notifications yet</div>
+          ) : (
+            notifications.map(notification => (
+              <div 
+                key={notification.id} 
+                className={`notification-item ${!notification.is_read ? 'unread' : ''}`}
+              >
+                <div className="notification-content">
+                  <p className="notification-message">{notification.message}</p>
+                  <small className="notification-time">
+                    {new Date(notification.created_at).toLocaleString()}
+                  </small>
+                </div>
+                <button 
+                  className="delete-notification"
+                  onClick={() => deleteNotification(notification.id)}
+                >
+                  ×
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
       {/* Side Navigation Bar */}
       <div 
         ref={navbarRef}
         className={`navbar ${expanded ? 'expanded' : ''}`}
       >
-        <button 
-          className="navbar-toggle"
-          onClick={() => setExpanded(!expanded)}
-        >
-          <FiMenu />
+       <div className="navbar-toggle-container">
+        <button className="navbar-toggle" onClick={() => setExpanded(!expanded)}>
+          <span className="menu-icon"><FiMenu /></span>
+          <span className="close-icon"><FiX /></span>
         </button>
+      </div>
         
         <div className="nav-items">
           {navItems.map((item, index) => (
             <div 
               key={index} 
-              className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+              className={`nav-item ${location.pathname.includes(item.path) ? 'active' : ''}`}
               onClick={() => handleNavItemClick(item.path)}
             >
               <span className="nav-icon">{item.icon}</span>

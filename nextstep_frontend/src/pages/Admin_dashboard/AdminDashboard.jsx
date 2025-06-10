@@ -6,7 +6,6 @@ import homeIcon from '../../assets/images/institution.png';
 import messagesIcon from '../../assets/images/chat.png';
 import brainIcon from '../../assets/images/brain.png';
 import userIcon from '../../assets/images/user.png';
-import wishlistIcon from '../../assets/images/wishlist.png';
 import '../../assets/styles/dashboard.css';
 import logoGif from '../../assets/images/logo.gif';
 import { Outlet } from 'react-router-dom';
@@ -22,12 +21,11 @@ const AdminDashboard = () => {
   const profileRef = useRef(null);
 
   const navItems = [
-    { icon: <img src={userIcon} alt="profile" className="nav-icon-img" />, title: 'Profile', path: 'profile' },
+    { icon: <img src={userIcon} alt="profile" className="nav-icon-img" />, title: 'Profile', path: 'users' },
     { icon: <img src={homeIcon} alt="Institutions" className="nav-icon-img" />, title: 'Institutions', path: 'institutions' },
     { icon: <img src={eventsIcon} alt="events" className="nav-icon-img" />, title: 'Events', path: 'events' },
     { icon: <img src={messagesIcon} alt="messages" className="nav-icon-img" />, title: 'Messages', path: 'messages' },
-    { icon: <img src={brainIcon} alt="core_type" className="nav-icon-img" />, title: 'Core Type', path: 'core-type' },
-    { icon: <img src={wishlistIcon} alt="saved_items" className="nav-icon-img" />, title: 'Saved Items', path: 'saved-items' }
+    { icon: <img src={brainIcon} alt="core_type" className="nav-icon-img" />, title: 'Core Type', path: 'core-type' }
   ];
 
   // Close dropdown when clicking outside

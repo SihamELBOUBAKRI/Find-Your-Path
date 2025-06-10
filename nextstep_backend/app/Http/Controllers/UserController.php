@@ -188,7 +188,8 @@ public function posts(User $user): JsonResponse
     $posts = $user->posts()
         ->with(['user', 'comments'])
         ->withCount('comments')
-        ->orderBy('created_at', 'desc');
+        ->orderBy('created_at', 'desc')
+        ->get(); // Add get() to execute the query
 
     return response()->json([
         'data' => $posts

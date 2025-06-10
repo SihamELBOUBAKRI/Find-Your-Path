@@ -14,12 +14,15 @@ class UserEventController extends Controller
     /**
      * Register a user for an event
      */
-    public function register(Request $request, Event $event): JsonResponse
+   public function register(Request $request, Event $event): JsonResponse
 {
     $validated = $request->validate([
         'user_id' => ['required', 'exists:users,id'],
         'status' => ['sometimes', Rule::in(['registered', 'attended', 'canceled'])]
     ]);
+
+    // Get the registering user
+    $user = User::find($validated['user_id']);
 
     // Prevent duplicate registration
     if ($event->registeredUsers()->where('user_id', $validated['user_id'])->exists()) {
@@ -36,12 +39,15 @@ class UserEventController extends Controller
         'status' => $status
     ]);
 
-    $event->user->notifications()->create([
-        'title' => 'New Registration',
-        'message' => $user->name . ' registered for your event: ' . $event->title,
-        'type' => 'event',
-        'data' => ['event_id' => $event->id]
-    ]);
+    // Only create notification if event has an owner
+    if ($event->user) {
+        $event->user->notifications()->create([
+            'title' => 'New Registration',
+            'message' => $user->name . ' registered for your event: ' . $event->title,
+            'type' => 'event',
+            'data' => ['event_id' => $event->id]
+        ]);
+    }
 
     return response()->json([
         'success' => true,
@@ -49,7 +55,6 @@ class UserEventController extends Controller
         'data' => $event->load('registeredUsers')
     ], 201);
 }
-
 public function verifyRegistration(Event $event, User $user): JsonResponse
 {
     $registration = $event->registeredUsers()
@@ -108,30 +113,59 @@ public function verifyRegistration(Event $event, User $user): JsonResponse
     /**
      * Cancel registration
      */
-    public function cancelRegistration(Event $event, User $user): JsonResponse
+    public function cancelRegistration(Event $event, $userId): JsonResponse
 {
-    // Update both status and deleted_at
-    $deleted = DB::table('user_event')
-        ->where('event_id', $event->id)
-        ->where('user_id', $user->id)
-        ->whereNull('deleted_at') // Only cancel active registrations
-        ->update([
-            'status' => 'canceled',
-            'deleted_at' => now()
-        ]);
+    // Convert userId to integer
+    $userId = (int)$userId;
+    
+    // Find the user
+    $user = User::find($userId);
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found'
+        ], 404);
+    }
 
-    if (!$deleted) {
+    // Check if registration exists
+    $registration = DB::table('user_event')
+        ->where('event_id', $event->id)
+        ->where('user_id', $userId)
+        ->whereNull('deleted_at')
+        ->first();
+
+    if (!$registration) {
         return response()->json([
             'success' => false,
             'message' => 'Registration not found or already canceled'
         ], 404);
     }
 
+    // Perform cancellation
+    $deleted = DB::table('user_event')
+        ->where('event_id', $event->id)
+        ->where('user_id', $userId)
+        ->whereNull('deleted_at')
+        ->update([
+            'status' => 'canceled',
+            'deleted_at' => now()
+        ]);
+
+    // Create notification if event has an owner and it's not the same user
+    if ($event->user_id && $event->user_id != $userId) {
+        $event->user->notifications()->create([
+            'title' => 'Registration Canceled',
+            'message' => $user->name . ' canceled registration for your event: ' . $event->title,
+            'type' => 'event',
+            'data' => ['event_id' => $event->id]
+        ]);
+    }
+
     return response()->json([
         'success' => true,
         'message' => 'Registration canceled successfully',
         'data' => [
-            'user_id' => $user->id,
+            'user_id' => $userId,
             'event_id' => $event->id,
             'status' => 'canceled',
             'canceled_at' => now()->toDateTimeString()

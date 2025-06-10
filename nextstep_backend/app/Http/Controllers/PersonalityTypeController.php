@@ -31,7 +31,10 @@ class PersonalityTypeController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:personality_types',
             'description' => 'required|string',
-            'character_image' => 'nullable|string',
+            'anime_character_image' => 'nullable|string',
+            'cartoon_character_image' => 'nullable|string',
+            'famous_star_image' => 'nullable|string',
+            'animal_image' => 'nullable|string',
             'traits' => 'required|array',
             'strengths' => 'nullable|array',
             'weaknesses' => 'nullable|array'
@@ -73,7 +76,10 @@ class PersonalityTypeController extends Controller
             'name' => 'sometimes|string|max:255',
             'slug' => 'sometimes|string|max:255|unique:personality_types,slug,'.$personalityType->id,
             'description' => 'sometimes|string',
-            'character_image' => 'nullable|string',
+            'anime_character_image' => 'nullable|string',
+            'cartoon_character_image' => 'nullable|string',
+            'famous_star_image' => 'nullable|string',
+            'animal_image' => 'nullable|string',
             'traits' => 'sometimes|array',
             'strengths' => 'nullable|array',
             'weaknesses' => 'nullable|array'

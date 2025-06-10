@@ -1,0 +1,421 @@
+/* Luxury Profile Page Styles */
+:root {
+  --luxury-primary: #05668D;
+  --luxury-primary-light: #427AA1;
+  --luxury-secondary: #3f37c9;
+  --luxury-accent: #4895ef;
+  --luxury-danger: #f72585;
+  --luxury-success: #4cc9f0;
+  --luxury-warning: #f8961e;
+  --luxury-dark: #1a1a2e;
+  --luxury-light: #f8f9fa;
+  --luxury-gray: #6c757d;
+  --luxury-gray-light: #e9ecef;
+  --luxury-gold: #FFD700;
+  --luxury-silver: #C0C0C0;
+  --luxury-border-radius: 16px;
+  --luxury-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --luxury-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.luxury-profile-container {
+  padding: 0;
+  max-width: 1600px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: var(--luxury-border-radius);
+  overflow: hidden;
+  box-shadow: var(--luxury-box-shadow);
+}
+
+.dark .luxury-profile-container {
+  background-color: #1e293b;
+}
+
+.luxury-profile-header {
+  background: linear-gradient(135deg, var(--luxury-primary), var(--luxury-secondary));
+  padding: 3rem 2rem;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 75% 30%, rgba(255,255,255,0.1) 0%, transparent 50%);
+}
+
+.luxury-avatar-container {
+  position: relative;
+  z-index: 1;
+}
+
+.luxury-profile-avatar {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: var(--luxury-transition);
+}
+
+.luxury-avatar-placeholder {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--luxury-primary), var(--luxury-secondary));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4.5rem;
+  font-weight: bold;
+  border: 5px solid rgba(255, 255, 255, 0.2);
+  margin: 0 auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.luxury-profile-name {
+  font-size: 2.2rem;
+  margin: 1.5rem 0 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.luxury-profile-title {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+  font-weight: 400;
+}
+
+.luxury-profile-layout {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 0;
+}
+
+.luxury-profile-info-side {
+  padding: 2.5rem;
+  background-color: #f9fafb;
+  border-right: 1px solid var(--luxury-gray-light);
+}
+
+.dark .luxury-profile-info-side {
+  background-color: #1e293b;
+  border-right-color: #334155;
+}
+
+.luxury-profile-section {
+  margin-bottom: 2.5rem;
+}
+
+.luxury-section-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  color: var(--luxury-dark);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--luxury-gray-light);
+}
+
+.dark .luxury-section-title {
+  color: #e2e8f0;
+  border-bottom-color: #334155;
+}
+
+.luxury-section-icon {
+  margin-right: 0.75rem;
+  color: var(--luxury-primary);
+  font-size: 1.1rem;
+}
+
+.luxury-detail-item {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+.luxury-detail-icon {
+  color: var(--luxury-primary);
+  font-size: 1.2rem;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.luxury-detail-item h3 {
+  font-size: 0.85rem;
+  color: var(--luxury-gray);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dark .luxury-detail-item h3 {
+  color: #94a3b8;
+}
+
+.luxury-detail-item p {
+  font-size: 0.95rem;
+  color: var(--luxury-dark);
+  margin: 0;
+  word-break: break-word;
+}
+
+.dark .luxury-detail-item p {
+  color: #e2e8f0;
+}
+
+.luxury-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--luxury-primary);
+  text-decoration: none;
+  transition: var(--luxury-transition);
+  font-weight: 500;
+}
+
+.luxury-link:hover {
+  color: var(--luxury-secondary);
+  text-decoration: underline;
+}
+
+.luxury-link svg {
+  margin-left: 0.3rem;
+  transition: var(--luxury-transition);
+}
+
+.luxury-link:hover svg {
+  transform: translateX(3px);
+}
+
+.luxury-bio {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--luxury-dark);
+  margin: 0;
+}
+
+.dark .luxury-bio {
+  color: #e2e8f0;
+}
+
+.luxury-recommendation {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--luxury-primary);
+  padding: 0.75rem 1rem;
+  border-radius: var(--luxury-border-radius);
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.dark .luxury-recommendation {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.luxury-personality-badge {
+  background: linear-gradient(135deg, var(--luxury-primary), var(--luxury-secondary));
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  display: inline-block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0.5rem 0 1rem;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.luxury-personality-description {
+  font-size: 0.9rem;
+  color: var(--luxury-gray);
+  line-height: 1.7;
+}
+
+.dark .luxury-personality-description {
+  color: #94a3b8;
+}
+
+/* Posts Side */
+.luxury-profile-posts-side {
+  padding: 2.5rem;
+}
+
+.luxury-posts-header {
+  margin-bottom: 2rem;
+}
+
+.luxury-posts-header h2 {
+  font-size: 1.5rem;
+  color: var(--luxury-dark);
+  font-weight: 700;
+  margin: 0;
+}
+
+.dark .luxury-posts-header h2 {
+  color: #e2e8f0;
+}
+
+.luxury-posts-highlight {
+  color: var(--luxury-primary);
+}
+
+.luxury-no-posts {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.luxury-no-posts-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.luxury-no-posts h3 {
+  font-size: 1.25rem;
+  color: var(--luxury-dark);
+  margin-bottom: 0.5rem;
+}
+
+.dark .luxury-no-posts h3 {
+  color: #e2e8f0;
+}
+
+.luxury-no-posts p {
+  color: var(--luxury-gray);
+  margin: 0;
+}
+
+.dark .luxury-no-posts p {
+  color: #94a3b8;
+}
+
+.luxury-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.luxury-load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.luxury-load-more-btn {
+  background: linear-gradient(135deg, var(--luxury-primary), var(--luxury-secondary));
+  color: white;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: var(--luxury-transition);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.luxury-load-more-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.luxury-load-more-btn:disabled {
+  background: var(--luxury-gray-light);
+  cursor: not-allowed;
+  box-shadow: none;
+  color: var(--luxury-gray);
+}
+
+.dark .luxury-load-more-btn:disabled {
+  background: #334155;
+  color: #94a3b8;
+}
+
+/* Post Card Customization */
+.luxury-post-card {
+  border-radius: var(--luxury-border-radius);
+  overflow: hidden;
+  box-shadow: var(--luxury-box-shadow);
+  transition: var(--luxury-transition);
+}
+
+.luxury-post-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .luxury-profile-layout {
+    grid-template-columns: 300px 1fr;
+  }
+}
+
+@media (max-width: 992px) {
+  .luxury-profile-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .luxury-profile-info-side {
+    border-right: none;
+    border-bottom: 1px solid var(--luxury-gray-light);
+  }
+  
+  .dark .luxury-profile-info-side {
+    border-bottom-color: #334155;
+  }
+}
+
+@media (max-width: 768px) {
+  .luxury-profile-header {
+    padding: 2rem 1rem;
+  }
+  
+  .luxury-profile-avatar,
+  .luxury-avatar-placeholder {
+    width: 140px;
+    height: 140px;
+    font-size: 3.5rem;
+  }
+  
+  .luxury-profile-name {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .luxury-profile-info-side,
+  .luxury-profile-posts-side {
+    padding: 1.75rem;
+  }
+  
+  .luxury-profile-avatar,
+  .luxury-avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    font-size: 3rem;
+  }
+  
+  .luxury-profile-name {
+    font-size: 1.6rem;
+  }
+  
+  .luxury-load-more-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}

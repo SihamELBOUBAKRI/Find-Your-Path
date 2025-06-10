@@ -15,47 +15,27 @@ class EventController extends Controller
      * Display a listing of events with filters
      */
     public function index(Request $request)
-    {
-        try {
-            $query = Event::with(['institution', 'registeredUsers'])
-                        ->when($request->has('institution_id'), function($q) use ($request) {
-                            return $q->where('institution_id', $request->institution_id);
-                        })
-                        ->when($request->has('upcoming'), function($q) {
-                            return $q->where('start_date', '>=', now());
-                        })
-                        ->when($request->has('free'), function($q) {
-                            return $q->where('is_free', true);
-                        });
+{
+    $query = Event::with(['institution', 'registeredUsers'])
+                ->when($request->upcoming && $request->upcoming === 'true', function($q) {
+                    $q->where('start_date', '>=', now());
+                })
+                ->when($request->free && $request->free === 'true', function($q) {
+                    $q->where('is_free', true);
+                })
+                ->when($request->institution_id, function($q, $institutionId) {
+                    $q->where('institution_id', $institutionId);
+                })
+                ->when($request->search, function($q, $search) {
+                    $q->where('title', 'like', "%{$search}%");
+                })
+                ->orderBy($request->sort_by ?? 'start_date', $request->sort_dir ?? 'asc');
 
-            // Search
-            if ($request->has('search')) {
-                $query->where(function($q) use ($request) {
-                    $q->where('title', 'like', '%'.$request->search.'%')
-                      ->orWhere('description', 'like', '%'.$request->search.'%');
-                });
-            }
-
-            // Sorting
-            $sortField = $request->get('sort_by', 'start_date');
-            $sortDirection = $request->get('sort_dir', 'asc');
-
-            $events = $query->orderBy($sortField, $sortDirection)
-                           ->paginate($request->get('per_page', 15));
-
-            return response()->json([
-                'success' => true,
-                'data' => $events
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve events',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    return response()->json([
+        'success' => true,
+        'data' => $query->paginate($request->per_page ?? 15)
+    ]);
+}
 
     /**
      * Store a newly created event

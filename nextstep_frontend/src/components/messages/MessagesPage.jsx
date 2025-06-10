@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import '../assets/styles/MessagesPage.css';
-import api from '../api';
-import PageLoading from '../pages/loading/loading';
+import '../../assets/styles/MessagesPage.css';
+import api from '../../api';
+import PageLoading from '../../pages/loading/loading';
 import { FiSettings, FiUser, FiUserX, FiMail } from 'react-icons/fi';
-import ConfirmForm from '../pages/alerts/ConfirmForm';
+import ConfirmForm from '../../pages/alerts/ConfirmForm';
 
 const MessagesPage = () => {
   const { userId, contactRequestId } = useParams();
@@ -222,7 +222,7 @@ const MessagesPage = () => {
         
         {loading.conversations ? (
           <div className="loading-conversations">
-            <PageLoading text="Loading conversations..." />
+            <PageLoading  />
           </div>
         ) : (
           <div className="conversation-list">
